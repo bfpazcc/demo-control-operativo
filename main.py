@@ -15,7 +15,17 @@ DB_PATH = "/tmp/control_operativo.db"
 
 templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
 
-# Capturador Global de Excepciones para mostrar el error real en pantalla si ocurre algo
+# Helper seguro para renderizar plantillas sin depender de la firma cambiante de Starlette TemplateResponse
+def render_template(name: str, request: Request, context: dict = None):
+    if context is None:
+        context = {}
+    ctx = {"request": request, **context}
+    # Obtener la plantilla Jinja2 directamente y renderizarla a HTML
+    tmpl = templates.get_template(name)
+    content = tmpl.render(ctx)
+    return HTMLResponse(content)
+
+# Capturador Global de Excepciones
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
     error_msg = traceback.format_exc()
@@ -72,8 +82,7 @@ def index(request: Request):
 
     conn.close()
 
-    return templates.TemplateResponse("index.html", {
-        "request": request,
+    return render_template("index.html", request, {
         "total_equipos": total_equipos,
         "lista_equipos": lista_equipos,
         "total_galones": total_galones,
@@ -91,8 +100,7 @@ def get_parte_diario(request: Request, mensaje: str = None):
     personal = [dict(row) for row in cursor.execute("SELECT * FROM personal").fetchall()]
     conn.close()
 
-    return templates.TemplateResponse("parte_diario.html", {
-        "request": request,
+    return render_template("parte_diario.html", request, {
         "equipos": equipos,
         "personal": personal,
         "mensaje": mensaje
@@ -120,7 +128,7 @@ def post_parte_diario(
     cursor.execute("""
     INSERT INTO partes_diarios (fecha, equipo_id, personal_id, tipo_sector, obra_origen, destino, lectura_inicial, lectura_final, unidades_trabajadas, observaciones)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    """, (fecha, equipo_id, personal_id, tipo_sector, obra_origen, destino, lectura_inicial, lectura_final, unidades_trabajadas, observations if 'observations' in locals() else observaciones))
+    """, (fecha, equipo_id, personal_id, tipo_sector, obra_origen, destino, lectura_inicial, lectura_final, unidades_trabajadas, observaciones))
 
     if tipo_sector == 'TRANSPORTE':
         cursor.execute("UPDATE equipos SET kilometraje_actual=? WHERE id=?", (lectura_final, equipo_id))
@@ -140,8 +148,7 @@ def get_combustible(request: Request, mensaje: str = None):
     personal = [dict(row) for row in cursor.execute("SELECT * FROM personal").fetchall()]
     conn.close()
 
-    return templates.TemplateResponse("combustible.html", {
-        "request": request,
+    return render_template("combustible.html", request, {
         "equipos": equipos,
         "personal": personal,
         "mensaje": mensaje
@@ -195,14 +202,13 @@ def get_mantenimiento(request: Request):
     alertas = [dict(row) for row in cursor.execute(query_alt).fetchall()]
     conn.close()
 
-    return templates.TemplateResponse("mantenimiento.html", {
-        "request": request,
+    return render_template("mantenimiento.html", request, {
         "alertas": alertas
     })
 
 @app.get("/portabilidad", response_class=HTMLResponse)
 def get_portabilidad(request: Request):
-    return templates.TemplateResponse("portabilidad.html", {"request": request})
+    return render_template("portabilidad.html", request)
 
 @app.get("/exportar-excel")
 def exportar_excel():
