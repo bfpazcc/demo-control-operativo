@@ -4,7 +4,7 @@ import io
 from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse, StreamingResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
-import pandas as pd
+import openpyxl
 
 app = FastAPI(title="Control Operativo Demo B2B")
 
@@ -190,23 +190,31 @@ def get_portabilidad(request: Request):
 @app.get("/exportar-excel")
 def exportar_excel():
     conn = get_db()
-    
-    df_equipos = pd.read_sql_query("SELECT * FROM equipos", conn)
-    df_partes = pd.read_sql_query("SELECT * FROM partes_diarios", conn)
-    df_combustible = pd.read_sql_query("SELECT * FROM abastecimientos_combustible", conn)
-    df_alertas = pd.read_sql_query("SELECT * FROM alertas_mantenimiento", conn)
-    
+    wb = openpyxl.Workbook()
+    wb.remove(wb.active)
+
+    sheets_queries = [
+        ('Equipos y Flota', 'SELECT * FROM equipos'),
+        ('Partes Diarios', 'SELECT * FROM partes_diarios'),
+        ('Combustible', 'SELECT * FROM abastecimientos_combustible'),
+        ('Alertas Mantenimiento', 'SELECT * FROM alertas_mantenimiento')
+    ]
+
+    for title, query in sheets_queries:
+        ws = wb.create_sheet(title=title)
+        cursor = conn.cursor()
+        cursor.execute(query)
+        columns = [col[0] for col in cursor.description]
+        ws.append(columns)
+        for row in cursor.fetchall():
+            ws.append(list(row))
+
     conn.close()
 
     output = io.BytesIO()
-    with pd.ExcelWriter(output, engine='openpyxl') as writer:
-        df_equipos.to_excel(writer, sheet_name='Equipos y Flota', index=False)
-        df_partes.to_excel(writer, sheet_name='Partes Diarios', index=False)
-        df_combustible.to_excel(writer, sheet_name='Combustible', index=False)
-        df_alertas.to_excel(writer, sheet_name='Alertas Mantenimiento', index=False)
-    
+    wb.save(output)
     output.seek(0)
-    
+
     headers = {
         'Content-Disposition': 'attachment; filename="Reporte_Control_Operativo_Demo.xlsx"'
     }
