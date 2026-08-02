@@ -1,8 +1,10 @@
 import sqlite3
 import os
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 db_path = "/tmp/control_operativo.db"
-schema_path = "/working_dir/c_9c876028e7cab330/demo_control_operativo/schema.sql"
+schema_path = os.path.join(BASE_DIR, "schema.sql")
+backup_path = os.path.join(BASE_DIR, "backup.sql")
 
 if os.path.exists(db_path):
     os.remove(db_path)
@@ -77,11 +79,10 @@ VALUES (?, ?, ?, ?, ?)
 
 conn.commit()
 
-# Dump backup SQL
-with open("/working_dir/c_9c876028e7cab330/demo_control_operativo/backup.sql", "w", encoding="utf-8") as f:
+with open(backup_path, "w", encoding="utf-8") as f:
     for line in conn.iterdump():
         f.write(f'{line}\n')
 
 conn.close()
 
-print("Base de datos SQLite en /tmp/control_operativo.db y backup.sql creados con éxito.")
+print("seed_data.py actualizado con rutas dinámicas relativas.")
