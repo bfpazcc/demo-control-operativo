@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Registro de Parte Diario - Control Operativo{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto space-y-6">
+
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <h2 class="text-xl font-bold text-slate-800 border-b pb-3 mb-4 flex items-center">
+            <i class="fa-solid fa-file-pen text-blue-600 mr-2"></i>Nuevo Parte Diario de Operación
+        </h2>
+
+        {% if mensaje %}
+        <div class="mb-4 p-4 bg-emerald-100 border border-emerald-300 text-emerald-800 text-sm rounded-lg font-medium flex items-center">
+            <i class="fa-solid fa-circle-check text-emerald-600 mr-2 text-lg"></i>
+            {{ mensaje }}
+        </div>
+        {% endif %}
+
+        <form action="/parte-diario" method="POST" class="space-y-4">
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Fecha</label>
+                    <input type="date" name="fecha" required value="2026-08-02" class="w-full border border-gray-300 p-2.5 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Equipo / Unidad</label>
+                    <select name="equipo_id" required class="w-full border border-gray-300 p-2.5 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        {% for eq in equipos %}
+                        <option value="{{ eq.id }}">{{ eq.codigo }} - {{ eq.categoria }} ({{ eq.tipo_sector }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Conductor / Operador Responsable</label>
+                    <select name="personal_id" required class="w-full border border-gray-300 p-2.5 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        {% for p in personal %}
+                        <option value="{{ p.id }}">{{ p.nombre }} ({{ p.cargo }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Obra / Frente / Origen</label>
+                    <input type="text" name="obra_origen" placeholder="Ej: Obra Yura - Cantera o Arequipa" required class="w-full border border-gray-300 p-2.5 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Destino (Si es Transporte) / Frente de Trabajo (Si es Maquinaria)</label>
+                <input type="text" name="destino" placeholder="Ej: Matarani / Frente 3 Excavación" class="w-full border border-gray-300 p-2.5 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-lg border border-slate-200">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Lectura Inicial (KM u Horómetro)</label>
+                    <input type="number" step="0.1" name="lectura_inicial" placeholder="Ej: 4242.0" required class="w-full border border-gray-300 p-2.5 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Lectura Final (KM u Horómetro)</label>
+                    <input type="number" step="0.1" name="lectura_final" placeholder="Ej: 4250.0" required class="w-full border border-gray-300 p-2.5 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Observaciones / Novedades en Turno</label>
+                <textarea name="observaciones" rows="3" placeholder="Inspección pre-uso OK, sin fugas de aceite..." class="w-full border border-gray-300 p-2.5 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+            </div>
+
+            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg shadow transition flex justify-center items-center space-x-2">
+                <i class="fa-solid fa-paper-plane"></i>
+                <span>Guardar Parte Diario</span>
+            </button>
+        </form>
+    </div>
+
+</div>
+{% endblock %}

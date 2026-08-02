@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Portabilidad y Servidor Propio - Guía Técnica{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-6">
+
+    <div class="bg-gradient-to-r from-slate-900 to-slate-800 text-white p-6 rounded-xl shadow-md">
+        <div class="flex items-center space-x-3">
+            <i class="fa-solid fa-server text-amber-400 text-3xl"></i>
+            <div>
+                <h2 class="text-2xl font-bold">Arquitectura Abierta y Escalable</h2>
+                <p class="text-sm text-slate-300">Portabilidad Total sin Lock-in de Proveedores ni Licencias por Usuario</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Beneficios Clave -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+            <div class="text-emerald-600 text-2xl font-bold mb-2">
+                <i class="fa-solid fa-globe"></i> Dominio Propio
+            </div>
+            <h3 class="font-bold text-slate-800 text-sm mb-1">Tu Marca y Dominio</h3>
+            <p class="text-xs text-gray-600">Asigna fácilmente dominios tipo <code class="bg-gray-100 px-1 text-slate-800 font-mono">control.miempresa.com</code> con certificado de seguridad SSL (HTTPS) gratuito (Let's Encrypt).</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+            <div class="text-blue-600 text-2xl font-bold mb-2">
+                <i class="fa-solid fa-hard-drive"></i> Servidor Propio (VPS/Docker)
+            </div>
+            <h3 class="font-bold text-slate-800 text-sm mb-1">Migración Transparente</h3>
+            <p class="text-xs text-gray-600">Despliega en cualquier proveedor de nube (DigitalOcean, AWS, Hetzner, Supabase, Render) o en un servidor físico de la empresa.</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+            <div class="text-amber-600 text-2xl font-bold mb-2">
+                <i class="fa-solid fa-database"></i> Propiedad de Datos
+            </div>
+            <h3 class="font-bold text-slate-800 text-sm mb-1">Sin Bloqueos</h3>
+            <p class="text-xs text-gray-600">La base de datos (PostgreSQL/SQLite) es 100% exportable a Excel o SQL sin cobros de transferencia de datos.</p>
+        </div>
+    </div>
+
+    <!-- Pasos de Despliegue para el Cliente -->
+    <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-4">
+        <h3 class="text-lg font-bold text-slate-800 border-b pb-2">
+            <i class="fa-solid fa-list-check text-blue-600 mr-2"></i>Pasos para la Entrega o Instalación en el Servidor del Cliente
+        </h3>
+
+        <ol class="list-decimal list-inside space-y-3 text-sm text-gray-700">
+            <li class="pl-2">
+                <strong>Configuración del Servidor Nube / VPS ($4 - $6 / mes costo directo servidor):</strong>
+                <p class="text-xs text-gray-500 ml-6">Se instala Docker y la aplicación en un servidor Linux (Ubuntu/Debian) en minutos.</p>
+            </li>
+            <li class="pl-2">
+                <strong>Vinculación del Dominio del Cliente:</strong>
+                <p class="text-xs text-gray-500 ml-6">Se agrega un registro CNAME o A en el DNS del dominio del cliente (ej: GoDaddy, Namecheap o Cloudflare).</p>
+            </li>
+            <li class="pl-2">
+                <strong>Base de Datos Relacional Abierta:</strong>
+                <p class="text-xs text-gray-500 ml-6">SQLite para PyMEs pequeñas o PostgreSQL / Supabase para almacenamiento masivo multi-obra.</p>
+            </li>
+            <li class="pl-2">
+                <strong>Instalación de App Móvil PWA en Teléfonos de Operadores:</strong>
+                <p class="text-xs text-gray-500 ml-6">Sin pasar por Google Play / App Store. Se añade directo al inicio del smartphone como App nativa.</p>
+            </li>
+        </ol>
+    </div>
+
+</div>
+{% endblock %}

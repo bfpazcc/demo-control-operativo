@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard General - Control Operativo{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <!-- Encabezado del Dashboard -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between bg-white p-5 rounded-xl shadow-sm border border-gray-200">
+        <div>
+            <h2 class="text-2xl font-bold text-slate-800">Panel Control Operativo</h2>
+            <p class="text-sm text-gray-500">Resumen en tiempo real para flotas de Transporte y Maquinaria Pesada en Arequipa / Sur</p>
+        </div>
+        <div class="mt-4 md:mt-0 flex items-center space-x-2">
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800">
+                <span class="w-2 h-2 mr-1.5 bg-emerald-500 rounded-full animate-pulse"></span> Sistema En Línea
+            </span>
+            <a href="/exportar-excel" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition">
+                <i class="fa-solid fa-download mr-1"></i> Descargar Reporte Excel
+            </a>
+        </div>
+    </div>
+
+    <!-- TARJETAS KPIS -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Card 1 -->
+        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 flex items-center space-x-4">
+            <div class="p-3 bg-blue-100 text-blue-600 rounded-lg text-2xl">
+                <i class="fa-solid fa-truck-moving"></i>
+            </div>
+            <div>
+                <p class="text-xs font-medium text-gray-500 uppercase">Equipos Activos</p>
+                <h3 class="text-2xl font-bold text-slate-800">{{ total_equipos }}</h3>
+                <p class="text-xs text-gray-400">Transporte y Maquinaria</p>
+            </div>
+        </div>
+        <!-- Card 2 -->
+        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 flex items-center space-x-4">
+            <div class="p-3 bg-amber-100 text-amber-600 rounded-lg text-2xl">
+                <i class="fa-solid fa-gas-pump"></i>
+            </div>
+            <div>
+                <p class="text-xs font-medium text-gray-500 uppercase">Galones Totales</p>
+                <h3 class="text-2xl font-bold text-slate-800">{{ "%.1f"|format(total_galones) }}</h3>
+                <p class="text-xs text-gray-400">S/. {{ "%.2f"|format(total_costo_combustible) }} Invertidos</p>
+            </div>
+        </div>
+        <!-- Card 3 -->
+        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 flex items-center space-x-4">
+            <div class="p-3 bg-emerald-100 text-emerald-600 rounded-lg text-2xl">
+                <i class="fa-solid fa-clipboard-check"></i>
+            </div>
+            <div>
+                <p class="text-xs font-medium text-gray-500 uppercase">Partes Registrados</p>
+                <h3 class="text-2xl font-bold text-slate-800">{{ total_partes }}</h3>
+                <p class="text-xs text-emerald-600 font-semibold">100% Digitalizado</p>
+            </div>
+        </div>
+        <!-- Card 4 -->
+        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 flex items-center space-x-4">
+            <div class="p-3 bg-red-100 text-red-600 rounded-lg text-2xl">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <div>
+                <p class="text-xs font-medium text-gray-500 uppercase">Alertas Manto</p>
+                <h3 class="text-2xl font-bold text-red-600">{{ alertas_pendientes }}</h3>
+                <p class="text-xs text-red-500 font-medium">Revisión requerida</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- TABLA DE EQUIPOS REGISTRADOS -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div class="p-5 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+            <h3 class="text-lg font-bold text-slate-800">
+                <i class="fa-solid fa-cubes text-slate-600 mr-2"></i>Estado Actual de Flotas y Equipos
+            </h3>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-gray-600">
+                <thead class="bg-slate-100 text-slate-700 uppercase text-xs font-bold border-b">
+                    <tr>
+                        <th class="p-4">Código / Placa</th>
+                        <th class="p-4">Sector</th>
+                        <th class="p-4">Categoría</th>
+                        <th class="p-4">Marca / Modelo</th>
+                        <th class="p-4">Kilometraje Actual</th>
+                        <th class="p-4">Horómetro Actual</th>
+                        <th class="p-4">Estado</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    {% for eq in lista_equipos %}
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="p-4 font-bold text-slate-900">{{ eq.codigo }}</td>
+                        <td class="p-4">
+                            {% if eq.tipo_sector == 'TRANSPORTE' %}
+                            <span class="px-2.5 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-semibold">TRANSPORTE</span>
+                            {% else %}
+                            <span class="px-2.5 py-1 bg-amber-100 text-amber-800 rounded-full text-xs font-semibold">MAQUINARIA</span>
+                            {% endif %}
+                        </td>
+                        <td class="p-4">{{ eq.categoria }}</td>
+                        <td class="p-4">{{ eq.marca }} {{ eq.modelo }}</td>
+                        <td class="p-4">{{ "{:,.0f}".format(eq.kilometraje_actual) }} KM</td>
+                        <td class="p-4">{{ "{:,.1f}".format(eq.horometro_actual) }} HRS</td>
+                        <td class="p-4">
+                            <span class="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded text-xs font-bold">{{ eq.estado }}</span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ÚLTIMOS REPOSTAJES DE COMBUSTIBLE -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div class="p-5 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
+            <h3 class="text-lg font-bold text-slate-800">
+                <i class="fa-solid fa-gas-pump text-red-500 mr-2"></i>Últimos Vales de Combustible Registrados
+            </h3>
+            <a href="/combustible" class="text-xs text-blue-600 font-semibold hover:underline">+ Agregar Abastecimiento</a>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-gray-600">
+                <thead class="bg-slate-100 text-slate-700 uppercase text-xs font-bold border-b">
+                    <tr>
+                        <th class="p-3">Fecha</th>
+                        <th class="p-3">Equipo</th>
+                        <th class="p-3">Responsable</th>
+                        <th class="p-3">Grifo / Cisterna</th>
+                        <th class="p-3">Galones</th>
+                        <th class="p-3">Costo Total</th>
+                        <th class="p-3">Rendimiento Estimado</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    {% for cb in ultimos_combustibles %}
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="p-3 font-medium">{{ cb.fecha }}</td>
+                        <td class="p-3 font-bold text-slate-800">{{ cb.codigo }}</td>
+                        <td class="p-3">{{ cb.personal_nombre }}</td>
+                        <td class="p-3">{{ cb.grifo_cisterna }}</td>
+                        <td class="p-3 font-semibold text-slate-900">{{ cb.galones }} Gal</td>
+                        <td class="p-3 text-emerald-700 font-bold">S/. {{ "%.2f"|format(cb.costo_total) }}</td>
+                        <td class="p-3">
+                            {% if cb.tipo_sector == 'TRANSPORTE' %}
+                                <span class="text-xs font-semibold text-blue-700 bg-blue-50 px-2 py-1 rounded">
+                                    {{ "%.2f"|format(cb.rendimiento_calculado) }} KM/Gal
+                                </span>
+                            {% else %}
+                                <span class="text-xs font-semibold text-amber-700 bg-amber-50 px-2 py-1 rounded">
+                                    {{ "%.2f"|format(1 / (cb.rendimiento_calculado + 0.0001)) }} Gal/Hora
+                                </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
