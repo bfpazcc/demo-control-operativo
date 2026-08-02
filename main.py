@@ -5,6 +5,7 @@ from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse, StreamingResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 import openpyxl
+import seed_data
 
 app = FastAPI(title="Control Operativo Demo B2B")
 
@@ -14,9 +15,17 @@ DB_PATH = "/tmp/control_operativo.db"
 templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
 
 def init_db():
-    if not os.path.exists(DB_PATH):
-        import seed_data
-        print("Base de datos inicializada con datos de prueba.")
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='equipos'")
+        exists = cursor.fetchone()
+        conn.close()
+        if not exists:
+            seed_data.create_seed_data(DB_PATH)
+    except Exception as e:
+        print("Init DB Exception:", e)
+        seed_data.create_seed_data(DB_PATH)
 
 @app.on_event("startup")
 def startup_event():
