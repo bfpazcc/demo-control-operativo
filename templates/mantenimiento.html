@@ -32,16 +32,16 @@
                         <td class="p-4 font-medium">{{ alt.tipo_mantenimiento }}</td>
                         <td class="p-4 font-semibold text-slate-800">
                             {% if alt.tipo_sector == 'TRANSPORTE' %}
-                                {{ alt.lectura_programada | num }} KM
+                                {{ "%.0f"|format(alt.lectura_programada or 0) }} KM
                             {% else %}
-                                {{ alt.lectura_programada | num(1) }} HRS
+                                {{ "%.1f"|format(alt.lectura_programada or 0) }} HRS
                             {% endif %}
                         </td>
                         <td class="p-4">
                             {% if alt.tipo_sector == 'TRANSPORTE' %}
-                                {{ alt.kilometraje_actual | num }} KM
+                                {{ "%.0f"|format(alt.kilometraje_actual or 0) }} KM
                             {% else %}
-                                {{ alt.horometro_actual | num(1) }} HRS
+                                {{ "%.1f"|format(alt.horometro_actual or 0) }} HRS
                             {% endif %}
                         </td>
                         <td class="p-4">

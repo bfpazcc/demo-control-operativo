@@ -11,24 +11,9 @@ import seed_data
 app = FastAPI(title="Control Operativo Demo B2B")
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-# Usar /tmp/control_operativo.db para permitir lectura/escritura SQLite sin bloqueos de disco
 DB_PATH = "/tmp/control_operativo.db"
 
 templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
-
-# Filtros seguros de formateo numérico para Jinja2
-def format_number(val, decimals=0):
-    if val is None:
-        val = 0
-    try:
-        val_float = float(val)
-        if decimals == 0:
-            return f"{int(val_float):,}"
-        return f"{val_float:,.{decimals}f}"
-    except Exception:
-        return str(val)
-
-templates.env.filters["num"] = format_number
 
 # Capturador Global de Excepciones para mostrar el error real en pantalla si ocurre algo
 @app.exception_handler(Exception)
@@ -135,7 +120,7 @@ def post_parte_diario(
     cursor.execute("""
     INSERT INTO partes_diarios (fecha, equipo_id, personal_id, tipo_sector, obra_origen, destino, lectura_inicial, lectura_final, unidades_trabajadas, observaciones)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    """, (fecha, equipo_id, personal_id, tipo_sector, obra_origen, destino, lectura_inicial, lectura_final, unidades_trabajadas, observaciones))
+    """, (fecha, equipo_id, personal_id, tipo_sector, obra_origen, destino, lectura_inicial, lectura_final, unidades_trabajadas, observations if 'observations' in locals() else observaciones))
 
     if tipo_sector == 'TRANSPORTE':
         cursor.execute("UPDATE equipos SET kilometraje_actual=? WHERE id=?", (lectura_final, equipo_id))
