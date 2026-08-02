@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Alertas de Mantenimiento - Control Operativo{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 flex justify-between items-center">
+        <div>
+            <h2 class="text-xl font-bold text-slate-800">Alertas de Mantenimiento Preventivo</h2>
+            <p class="text-sm text-gray-500">Supervisión automática por kilometraje acumulado u horómetro de trabajo</p>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-gray-600">
+                <thead class="bg-slate-100 text-slate-700 uppercase text-xs font-bold border-b">
+                    <tr>
+                        <th class="p-4">Equipo / Unidad</th>
+                        <th class="p-4">Tipo de Mantenimiento</th>
+                        <th class="p-4">Lectura Programada</th>
+                        <th class="p-4">Lectura Actual</th>
+                        <th class="p-4">Estado Alerta</th>
+                        <th class="p-4">Detalle / Acción</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    {% for alt in alertas %}
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="p-4 font-bold text-slate-900">{{ alt.codigo }} ({{ alt.categoria }})</td>
+                        <td class="p-4 font-medium">{{ alt.tipo_mantenimiento }}</td>
+                        <td class="p-4 font-semibold text-slate-800">
+                            {% if alt.tipo_sector == 'TRANSPORTE' %}
+                                {{ "%.0f"|format(alt.lectura_programada or 0) }} KM
+                            {% else %}
+                                {{ "%.1f"|format(alt.lectura_programada or 0) }} HRS
+                            {% endif %}
+                        </td>
+                        <td class="p-4">
+                            {% if alt.tipo_sector == 'TRANSPORTE' %}
+                                {{ "%.0f"|format(alt.kilometraje_actual or 0) }} KM
+                            {% else %}
+                                {{ "%.1f"|format(alt.horometro_actual or 0) }} HRS
+                            {% endif %}
+                        </td>
+                        <td class="p-4">
+                            {% if alt.estado == 'VENCIDO' %}
+                            <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-xs font-bold animate-pulse">VENCIDO</span>
+                            {% elif alt.estado == 'PENDIENTE' %}
+                            <span class="px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-xs font-bold">PENDIENTE</span>
+                            {% else %}
+                            <span class="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-bold">REALIZADO</span>
+                            {% endif %}
+                        </td>
+                        <td class="p-4 text-xs text-gray-500">{{ alt.descripcion }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

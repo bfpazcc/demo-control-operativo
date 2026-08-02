@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Registro de Combustible - Control Operativo{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto space-y-6">
+
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <h2 class="text-xl font-bold text-slate-800 border-b pb-3 mb-4 flex items-center">
+            <i class="fa-solid fa-gas-pump text-red-500 mr-2"></i>Abastecimiento de Combustible
+        </h2>
+
+        {% if mensaje %}
+        <div class="mb-4 p-4 bg-emerald-100 border border-emerald-300 text-emerald-800 text-sm rounded-lg font-medium flex items-center">
+            <i class="fa-solid fa-circle-check text-emerald-600 mr-2 text-lg"></i>
+            {{ mensaje }}
+        </div>
+        {% endif %}
+
+        <form action="/combustible" method="POST" class="space-y-4">
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Fecha de Repostaje</label>
+                    <input type="date" name="fecha" required value="2026-08-02" class="w-full border border-gray-300 p-2.5 rounded-lg text-sm focus:ring-2 focus:ring-red-500 focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Equipo / Unidad</label>
+                    <select name="equipo_id" required class="w-full border border-gray-300 p-2.5 rounded-lg text-sm focus:ring-2 focus:ring-red-500 focus:outline-none">
+                        {% for eq in equipos %}
+                        <option value="{{ eq.id }}">{{ eq.codigo }} - {{ eq.categoria }} ({{ eq.tipo_sector }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Responsable del Registro</label>
+                    <select name="personal_id" required class="w-full border border-gray-300 p-2.5 rounded-lg text-sm focus:ring-2 focus:ring-red-500 focus:outline-none">
+                        {% for p in personal %}
+                        <option value="{{ p.id }}">{{ p.nombre }} ({{ p.cargo }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Grifo / Cisterna en Obra</label>
+                    <input type="text" name="grifo_cisterna" placeholder="Ej: Grifo Primax Vía Evitamiento / Cisterna Obra 2" required class="w-full border border-gray-300 p-2.5 rounded-lg text-sm focus:ring-2 focus:ring-red-500 focus:outline-none">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-red-50 p-4 rounded-lg border border-red-100">
+                <div>
+                    <label class="block text-xs font-bold text-red-900 uppercase mb-1">Galones Surtidos</label>
+                    <input type="number" step="0.01" name="galones" placeholder="Ej: 50.0" required class="w-full border border-gray-300 p-2.5 rounded-lg text-sm focus:ring-2 focus:ring-red-500 focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-red-900 uppercase mb-1">Costo Total (S/.)</label>
+                    <input type="number" step="0.01" name="costo_total" placeholder="Ej: 750.00" required class="w-full border border-gray-300 p-2.5 rounded-lg text-sm focus:ring-2 focus:ring-red-500 focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-red-900 uppercase mb-1">Lectura (KM o Horas)</label>
+                    <input type="number" step="0.1" name="lectura_momento" placeholder="Ej: 245000" required class="w-full border border-gray-300 p-2.5 rounded-lg text-sm focus:ring-2 focus:ring-red-500 focus:outline-none">
+                </div>
+            </div>
+
+            <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg shadow transition flex justify-center items-center space-x-2">
+                <i class="fa-solid fa-gas-pump"></i>
+                <span>Registrar Combustible</span>
+            </button>
+        </form>
+    </div>
+
+</div>
+{% endblock %}
