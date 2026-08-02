@@ -32,16 +32,16 @@
                         <td class="p-4 font-medium">{{ alt.tipo_mantenimiento }}</td>
                         <td class="p-4 font-semibold text-slate-800">
                             {% if alt.tipo_sector == 'TRANSPORTE' %}
-                                {{ "{:,.0f}".format(alt.lectura_programada) }} KM
+                                {{ alt.lectura_programada | num }} KM
                             {% else %}
-                                {{ "{:,.1f}".format(alt.lectura_programada) }} HRS
+                                {{ alt.lectura_programada | num(1) }} HRS
                             {% endif %}
                         </td>
                         <td class="p-4">
                             {% if alt.tipo_sector == 'TRANSPORTE' %}
-                                {{ "{:,.0f}".format(alt.kilometraje_actual) }} KM
+                                {{ alt.kilometraje_actual | num }} KM
                             {% else %}
-                                {{ "{:,.1f}".format(alt.horometro_actual) }} HRS
+                                {{ alt.horometro_actual | num(1) }} HRS
                             {% endif %}
                         </td>
                         <td class="p-4">
@@ -51,8 +51,6 @@
                             <span class="px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-xs font-bold">PENDIENTE</span>
                             {% else %}
                             <span class="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-xs font-bold">REALIZADO</span>
-                            {% if alt.estado == 'PENDIENTE' %}
-                            {% endif %}
                             {% endif %}
                         </td>
                         <td class="p-4 text-xs text-gray-500">{{ alt.descripcion }}</td>

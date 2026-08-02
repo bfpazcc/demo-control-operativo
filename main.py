@@ -1,8 +1,9 @@
 import sqlite3
 import os
 import io
+import traceback
 from fastapi import FastAPI, Request, Form
-from fastapi.responses import HTMLResponse, StreamingResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, StreamingResponse, RedirectResponse, PlainTextResponse
 from fastapi.templating import Jinja2Templates
 import openpyxl
 import seed_data
@@ -10,9 +11,31 @@ import seed_data
 app = FastAPI(title="Control Operativo Demo B2B")
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# Usar /tmp/control_operativo.db para permitir lectura/escritura SQLite sin bloqueos de disco
 DB_PATH = "/tmp/control_operativo.db"
 
 templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
+
+# Filtros seguros de formateo numérico para Jinja2
+def format_number(val, decimals=0):
+    if val is None:
+        val = 0
+    try:
+        val_float = float(val)
+        if decimals == 0:
+            return f"{int(val_float):,}"
+        return f"{val_float:,.{decimals}f}"
+    except Exception:
+        return str(val)
+
+templates.env.filters["num"] = format_number
+
+# Capturador Global de Excepciones para mostrar el error real en pantalla si ocurre algo
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    error_msg = traceback.format_exc()
+    print("DETALLE DEL ERROR EN SERVIDOR:\n", error_msg)
+    return PlainTextResponse(f"ERROR DETALLADO EN EL SERVIDOR:\n\n{error_msg}", status_code=500)
 
 def init_db():
     try:
@@ -24,7 +47,7 @@ def init_db():
         if not exists:
             seed_data.create_seed_data(DB_PATH)
     except Exception as e:
-        print("Init DB Exception:", e)
+        print("Error al inicializar DB:", e)
         seed_data.create_seed_data(DB_PATH)
 
 @app.on_event("startup")
